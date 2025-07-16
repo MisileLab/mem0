@@ -1,23 +1,28 @@
-from datetime import datetime, UTC
-from typing import List, Optional, Set
-from uuid import UUID, uuid4
 import logging
-import os
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, joinedload
-from fastapi_pagination import Page, Params
-from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
-from pydantic import BaseModel
-from sqlalchemy import or_, func
-from app.utils.memory import get_memory_client
+from datetime import UTC, datetime
+from typing import List, Optional, Set
+from uuid import UUID
 
 from app.database import get_db
 from app.models import (
-    Memory, MemoryState, MemoryAccessLog, App,
-    MemoryStatusHistory, User, Category, AccessControl, Config as ConfigModel
+    AccessControl,
+    App,
+    Category,
+    Memory,
+    MemoryAccessLog,
+    MemoryState,
+    MemoryStatusHistory,
+    User,
 )
-from app.schemas import MemoryResponse, PaginatedMemoryResponse
+from app.schemas import MemoryResponse
+from app.utils.memory import get_memory_client
 from app.utils.permissions import check_memory_access_permissions
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi_pagination import Page, Params
+from fastapi_pagination.ext.sqlalchemy import paginate as sqlalchemy_paginate
+from pydantic import BaseModel
+from sqlalchemy import func
+from sqlalchemy.orm import Session, joinedload
 
 router = APIRouter(prefix="/api/v1/memories", tags=["memories"])
 
@@ -212,7 +217,8 @@ async def create_memory(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     # Get or create app
-    app_obj = db.query(App).filter(App.name == request.app).first()
+    app_obj = db.query(App).filter(App.name == request.app,
+                                   App.owner_id == user.id).first()
     if not app_obj:
         app_obj = App(name=request.app, owner_id=user.id)
         db.add(app_obj)
@@ -411,7 +417,7 @@ async def pause_memories(
         ).all()
         for memory in memories:
             update_memory_state(db, memory.id, state, user_id)
-        return {"message": f"Successfully paused all memories"}
+        return {"message": "Successfully paused all memories"}
 
     if memory_ids:
         # Pause specific memories
