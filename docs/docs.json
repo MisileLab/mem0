@@ -677,7 +677,6 @@
                     "group": "\ud83d\udca1 Examples",
                     "icon": "lightbulb",
                     "pages": [
-                      "examples",
                       "v0x/examples/mem0-demo",
                       "v0x/examples/ai_companion_js",
                       "v0x/examples/mem0-with-ollama",
@@ -777,6 +776,20 @@
     "intercom": {
       "appId": "jjv2r0tt"
     }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      {
+        "title": "Try in Playground",
+        "description": "Open this example in the interactive Mem0 playground",
+        "icon": "play",
+        "href": "https://app.mem0.ai/playground"
+      }
+    ]
   },
   "redirects": [
     {
